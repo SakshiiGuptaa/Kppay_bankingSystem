@@ -1,11 +1,9 @@
 @extends('frontend::layouts.auth')
-
 @section('title')
-    {{ __('Finish Up') }}
+    {{ __('Verify Email') }}
 @endsection
-
 @section('content')
-    <!-- Register Section -->
+    <!-- Email Verification Section -->
     <div class="half-authpage">
         <div class="authOne">
             <div class="auth-contents">
@@ -18,7 +16,8 @@
                     <div class="no-user-header">
                         @if(setting('language_switcher'))
                             <div class="language-switcher">
-                                <select class="langu-swit small" name="language" onchange="window.location.href=this.options[this.selectedIndex].value;">
+                                <select class="langu-swit small" name="language" id=""
+                                        onchange="window.location.href=this.options[this.selectedIndex].value;">
                                     @foreach(\App\Models\Language::where('status',true)->get() as $lang)
                                         <option
                                             value="{{ route('language-update',['name'=> $lang->locale]) }}" @selected( app()->getLocale() == $lang->locale )>{{$lang->name}}</option>
@@ -33,37 +32,33 @@
                     </div>
                 </div>
                 <div class="contents">
-                    <div class="content finish-wrapper">
-                        <h3 class="centered">
-                            @if(setting('referral_signup_bonus','permission'))
-                            {{ __('Congratulations! You have earned :bonus by signing up.',['bonus' => $currencySymbol.setting('signup_bonus','fee')]) }}
-                            @else
-                            {{ __('Congratulations! You made it.') }}
-                            @endif
-                        </h3>
-                        <div class="inputs centered">
-                            <a href="{{ route('user.dashboard') }}" class="site-btn primary-btn"><i data-lucide="inbox"></i>{{ __('Go to Dashboard') }}</a>
+                    <div class="content">
+                        <h3>{{ __('Email Verification') }}</h3>
+                        <div class="success-message">
+                            <p>{{ __('Sent the link on your email. Please check your inbox') }}</p>
                         </div>
+                        @if (session('status') === 'verification-link-sent')
+                            <div class="success-message">
+                                <p>{{ __('A new verification link has been sent to the email address you provided during registration.') }}</p>
+                            </div>
+                        @endif
+                        <form method="POST" action="{{ route('verification.send') }}">
+                            @csrf
+                            <div class="inputs">
+                                <button type="submit" class="site-btn primary-btn w-100 centered">{{ __('Resend the email') }}</button>
+                            </div>
+                        </form>
+                        <p>{{ __('Already have an account?') }} <a href="{{ route('login') }}">{{ __('Login here') }}</a></p>
                     </div>
                 </div>
             </div>
         </div>
+        <div class="authOne">
+            <div class="auth-banner" style="background: url('{{ asset(getPageSetting('breadcrumb')) }}') no-repeat;"></div>
+        </div>
     </div>
-    <!-- Register Section End -->
+    <!-- Email Verification Section End -->
 @endsection
 
-@push('js')
-<script type="text/javascript" src="{{ asset('front/js/confetti.min.js') }}"></script>
-<script>
-    'use strict';
 
-    // start
-    const start = () => {
-        setTimeout(function() {
-            confetti.start()
-        }, 1000); // 1000 is time that after 1 second start the confetti ( 1000 = 1 sec)
-    };
 
-    start();
-</script>
-@endpush
